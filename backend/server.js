@@ -21,19 +21,8 @@ if (!process.env.JWT_SECRET) {
 
 const app = express();
 
-// CORS — allow only same origin in production, or configure ALLOWED_ORIGIN in .env
-const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';
-app.use(cors({
-  origin: (origin, cb) => {
-    // Allow requests with no origin (curl, mobile apps, same-origin)
-    if (!origin || origin === allowedOrigin || origin.startsWith('http://localhost')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+// CORS
+app.use(cors());
 
 app.use(express.json({ limit: '1mb' }));
 
