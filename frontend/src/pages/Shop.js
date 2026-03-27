@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './Shop.css';
 
-const WA_NUMBER = process.env.REACT_APP_WHATSAPP || '79991234567';
+const WA_NUMBER = process.env.REACT_APP_WHATSAPP || '79659573660';
 
 const CartIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
