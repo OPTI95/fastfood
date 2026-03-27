@@ -6,7 +6,6 @@ function Admin() {
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -50,14 +49,12 @@ function Admin() {
 
   const loadData = async () => {
     try {
-      const [productsRes, categoriesRes, ordersRes] = await Promise.all([
+      const [productsRes, categoriesRes] = await Promise.all([
         API.get('/api/admin/products'),
-        API.get('/api/admin/categories'),
-        API.get('/api/admin/orders')
+        API.get('/api/admin/categories')
       ]);
       setProducts(productsRes.data);
       setCategories(categoriesRes.data);
-      setOrders(ordersRes.data);
       setLoading(false);
     } catch (err) {
       setError('Ошибка загрузки данных');
@@ -180,12 +177,6 @@ function Admin() {
             onClick={() => setActiveTab('categories')}
           >
             Категории
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
-            onClick={() => setActiveTab('orders')}
-          >
-            Заказы
           </button>
         </div>
 
@@ -366,42 +357,6 @@ function Admin() {
           </div>
         )}
 
-        {/* ЗАКАЗЫ */}
-        {activeTab === 'orders' && (
-          <div className="tab-content">
-            <h2>Заказы ({orders.length})</h2>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Имя</th>
-                    <th>Телефон</th>
-                    <th>Сумма</th>
-                    <th>Статус</th>
-                    <th>Дата</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map(order => (
-                    <tr key={order.id}>
-                      <td>#{order.id}</td>
-                      <td>{order.customer_name}</td>
-                      <td>{order.customer_phone}</td>
-                      <td>{order.total_price} ₽</td>
-                      <td>
-                        <span className={`status-badge status-${order.status}`}>
-                          {order.status === 'pending' ? '⏳ Новый' : '✅ Готов'}
-                        </span>
-                      </td>
-                      <td>{new Date(order.created_at).toLocaleDateString('ru-RU')}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
