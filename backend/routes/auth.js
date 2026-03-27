@@ -5,54 +5,52 @@ const db = require('../db');
 
 const router = express.Router();
 
-// Register
-router.post('/register', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const result = await db.query(
-      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
-      [username, email, hashedPassword]
-    );
-
-    res.json({ message: 'Admin registered', user: result.rows[0] });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+// Registration disabled — create admins via CLI:
+//   psql fastfood_db -c "INSERT INTO users(username,email,password,role) VALUES('admin','a@a.com','$(node -e "const b=require(\'bcryptjs\');b.hash(\'PASSWORD\',10).then(h=>process.stdout.write(h))"))','admin')"
+router.post('/register', (req, res) => {
+  res.status(403).json({ error: 'Registration is disabled' });
 });
 
 // Login
 router.post('/login', async (req, res) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return res.status(500).json({ error: 'Server misconfiguration' });
+
   try {
     const { username, password } = req.body;
 
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password required' });
+    }
+
     const result = await db.query(
       'SELECT * FROM users WHERE username = $1',
-      [username]
+      [String(username).slice(0, 100)]
     );
 
+    // Same error for wrong user OR wrong password — prevents user enumeration
+    const INVALID = 'Invalid credentials';
+
     if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: INVALID });
     }
 
     const user = result.rows[0];
-    const isValidPassword = await bcrypt.compare(password, user.password);
-
-    if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const isValid = await bcrypt.compare(String(password), user.password);
+    if (!isValid) {
+      return res.status(401).json({ error: INVALID });
     }
 
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
-      process.env.JWT_SECRET || 'your_secret_key',
+      secret,
       { expiresIn: '24h' }
     );
 
     res.json({ token, user: { id: user.id, username: user.username } });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

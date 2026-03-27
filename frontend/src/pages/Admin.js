@@ -16,12 +16,33 @@ function Admin() {
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const API = axios.create({
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
   });
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await API.post('/api/admin/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setProductForm(prev => ({ ...prev, imageUrl: res.data.url }));
+      setSuccess('✅ Фото загружено');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Ошибка загрузки фото');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -152,19 +173,19 @@ function Admin() {
             className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`}
             onClick={() => setActiveTab('products')}
           >
-            📦 Товары
+            Товары
           </button>
           <button
             className={`tab-btn ${activeTab === 'categories' ? 'active' : ''}`}
             onClick={() => setActiveTab('categories')}
           >
-            🏷️ Категории
+            Категории
           </button>
           <button
             className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
             onClick={() => setActiveTab('orders')}
           >
-            📋 Заказы
+            Заказы
           </button>
         </div>
 
@@ -202,12 +223,21 @@ function Admin() {
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
-              <input
-                type="text"
-                placeholder="URL изображения"
-                value={productForm.imageUrl}
-                onChange={(e) => setProductForm({ ...productForm, imageUrl: e.target.value })}
-              />
+              <div className="image-upload-group">
+                <input
+                  type="text"
+                  placeholder="URL изображения (или загрузите файл ниже)"
+                  value={productForm.imageUrl}
+                  onChange={(e) => setProductForm({ ...productForm, imageUrl: e.target.value })}
+                />
+                <label className="upload-label">
+                  {uploading ? 'Загрузка…' : '📎 Загрузить фото'}
+                  <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+                </label>
+                {productForm.imageUrl && (
+                  <img src={productForm.imageUrl} alt="preview" className="image-preview" />
+                )}
+              </div>
               <button type="submit" className="btn-primary">
                 {editingProduct ? 'Обновить товар' : 'Добавить товар'}
               </button>
@@ -256,13 +286,13 @@ function Admin() {
                             });
                           }}
                         >
-                          ✏️ Изменить
+                          Изменить
                         </button>
                         <button
                           className="btn-danger"
                           onClick={() => handleDeleteProduct(product.id)}
                         >
-                          🗑️ Удалить
+                          Удалить
                         </button>
                       </td>
                     </tr>
@@ -321,13 +351,13 @@ function Admin() {
                         setCategoryForm({ name: category.name, description: category.description });
                       }}
                     >
-                      ✏️ Изменить
+                      Изменить
                     </button>
                     <button
                       className="btn-danger"
                       onClick={() => handleDeleteCategory(category.id)}
                     >
-                      🗑️ Удалить
+                      Удалить
                     </button>
                   </div>
                 </div>
@@ -339,7 +369,7 @@ function Admin() {
         {/* ЗАКАЗЫ */}
         {activeTab === 'orders' && (
           <div className="tab-content">
-            <h2>📋 Заказы ({orders.length})</h2>
+            <h2>Заказы ({orders.length})</h2>
             <div className="table-container">
               <table>
                 <thead>

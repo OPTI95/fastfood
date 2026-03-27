@@ -3,60 +3,64 @@
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 60px);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  padding: 40px 20px;
+  background: var(--bg);
 }
 
 .login-card {
-  background: white;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 40px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
 }
 
 .login-card h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 28px;
+  letter-spacing: -.3px;
 }
 
 .login-card form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-}
-
-.login-card input {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
+  gap: 12px;
 }
 
 .login-card button[type="submit"] {
-  padding: 12px;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 13px;
+  font-size: 14px;
+  margin-top: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .toggle-link {
   text-align: center;
   margin-top: 20px;
-  color: #666;
+  color: var(--text-3);
+  font-size: 13px;
 }
 
 .link-btn {
   background: none;
   border: none;
-  color: #667eea;
+  color: var(--amber);
   cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  font-weight: bold;
+  padding: 0 4px;
+  font-weight: 600;
+  font-size: 13px;
+  font-family: inherit;
+  transition: color .15s;
+  transform: none;
+  box-shadow: none;
 }
 
 .link-btn:hover {
-  color: #764ba2;
+  color: #e0a030;
+  transform: none;
+  box-shadow: none;
 }
